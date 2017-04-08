@@ -6,16 +6,16 @@ var express = require("express"),
 
 	var route = express.Router();
 
+	route.param('id', function(req, res, next, id) {
+		dbconn.tcnModel.findById(id).then(function(user) {
+			req.user = user;
+			next();
+		}, function(err) {
+			res.status(500).send({msg: "invalid user"})
+		})
+	});
+
 	route.route('/')
-	// .get(function(req, res, next) {
-	// 	db.find({}, function(err, todos) {
-	// 		if(todos.length == 0) { return next(new Error("No tasks found")); }
-	// 		if(err){ return next(err); }
-	// 		res.status(200).json(todos);
-			
-	// 	});
-	// })
-	
 	.get(function(req, res, next) {
 		dbconn.tcnModel.findAll({}).then(function(user){
 			res.status(200).send(user);
@@ -35,39 +35,43 @@ var express = require("express"),
 		})
 
 	})
-	.delete(function(req, res, next) {
-		todomodel.remove({}, function(err, todos) {
-			if(todos.length == 0) { return next(new Error("No tasks found")); }
-			if(err){ return next(err); }
-			res.status(200).json(todos);
 
-		});
-	})
+	
 
 // Routes that take id as a parameter
 
 route.route('/:id')
 	.get(function(req, res, next) {
-		todomodel.findOne({_id: req.params.id}, function(err, todos){
-			if(!todos) { return next(new Error("No task found by id")); }
-			if(err){ return next(err); }
-			res.status(200).json(todos);
+		dbconn.tcnModel.findOne({where: {id: req.params.id
+  		}}, req.body).then(function(user){
+			res.status(200).send(user);
 
-		});
+		}).catch(function(err){
+			console.log(err.message);
+		})
+
 	})
-	.put(function(req, res, next){
-		todomodel.findOneAndUpdate({_id: req.params.id}, req.body, function(err, todos){
-			if(!todos) { return next(new Error("couldnt update, id not found")); }
-			if(err){ return next(err); }
-			res.status(200).json(todos);
-		});
+
+	.put(function(req, res, next) {
+		dbconn.tcnModel.update(req.body, {where: {id: req.params.id
+  		}}).then(function(user){
+			res.status(200).send(req.user);
+
+		}).catch(function(err){
+			console.log(err.message);
+		})
+
 	})
+
 	.delete(function(req, res, next) {
-		todomodel.findOneAndRemove({_id: req.params.id}, req.body, function(err, todos) {
-			if(!todos) { return next(new Error("couldnt delete, id not found")); }
-			if(err){ return next(err); }
-			res.status(200).json(todos);
-		});
+		dbconn.tcnModel.destroy({where: {id: req.params.id
+  		}}, req.body).then(function(user){
+			res.status(200).json(req.user);
+
+		}).catch(function(err){
+			console.log(err.message);
+		})
+
 	})
 
 
