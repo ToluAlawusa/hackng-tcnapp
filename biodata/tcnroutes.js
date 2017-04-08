@@ -15,8 +15,18 @@ var express = require("express"),
 			
 	// 	});
 	// })
+	
+	.get(function(req, res, next) {
+		dbconn.tcnModel.findAll({}).then(function(user){
+			res.status(200).send(user);
+
+		}).catch(function(err){
+			console.log(err.message);
+		})
+
+	})
+
 	.post(function(req, res, next) {
-		console.log(dbconn);
 		dbconn.tcnModel.create(req.body).then(function(user){
 			res.status(200).send(user);
 

@@ -4,9 +4,8 @@ var app = require('./server/server.js'),
 
 
 // this starts the app
-db.conn.sync().then(function() {
+
 	app.listen(PORT, function(){
 		console.log('Express Server Started on port '+ PORT +'!');
 
 	});
-});
