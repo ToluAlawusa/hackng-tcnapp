@@ -53,12 +53,15 @@ route.route('/:id')
 	})
 
 	.put(function(req, res, next) {
-		dbconn.tcnModel.update(req.body, {where: {id: req.params.id
-  		}}).then(function(user){
-			res.status(200).send(req.user);
-
-		}).catch(function(err){
-			console.log(err.message);
+		dbconn.tcnModel.findById(req.params.id)
+		.then(function(user) {
+			return user.updateAttributes(req.body)
+		}, function(err) {
+			res.status(500).send(err);
+		}).then(function(user){
+			res.status(200).send(user)
+		}).catch(function(err) {
+			res.status(500).send(err);
 		})
 
 	})
